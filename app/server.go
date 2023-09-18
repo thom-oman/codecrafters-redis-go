@@ -27,26 +27,22 @@ func main() {
 		fmt.Println("Error accepting connection: ", err.Error())
 		os.Exit(1)
 	}
-	for {
-		handleRequest(conn)
-	}
-}
-
-func handleRequest(conn net.Conn) {
 	reader := bufio.NewReader(conn)
-	var resp []byte
-	n, err := reader.Read(resp)
-	if err != nil {
-		fmt.Println("Error reading connection: ", err.Error())
-	}
+	for {
+		var resp []byte
+		n, err := reader.Read(resp)
+		if err != nil {
+			fmt.Println("Error reading connection: ", err.Error())
+		}
 
-	if n > 0 {
-		fmt.Printf("%v", resp)
-	}
+		if n > 0 {
+			fmt.Printf("%v", resp)
+		}
 
-	_, err = conn.Write([]byte("+PONG\r\n"))
-	if err != nil {
-		fmt.Println("Failed to write")
-		os.Exit(1)
+		_, err = conn.Write([]byte("+PONG\r\n"))
+		if err != nil {
+			fmt.Println("Failed to write")
+			os.Exit(1)
+		}
 	}
 }
