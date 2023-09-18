@@ -39,6 +39,7 @@ func handleRequest(conn net.Conn) {
 		l, err := reader.ReadBytes('\n')
 		if err == io.EOF {
 			conn.Close()
+			break
 		}
 		fmt.Printf("Received %v", l)
 		conn.Write([]byte("+PONG\r\n"))
