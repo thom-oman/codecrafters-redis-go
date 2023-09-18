@@ -20,16 +20,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	for {
-		conn, err := l.Accept()
-		defer conn.Close()
+	conn, err := l.Accept()
+	defer conn.Close()
 
-		if err != nil {
-			fmt.Println("Error accepting connection: ", err.Error())
-			os.Exit(1)
-		}
-		go handleRequest(conn)
+	if err != nil {
+		fmt.Println("Error accepting connection: ", err.Error())
+		os.Exit(1)
 	}
+	handleRequest(conn)
 }
 
 func handleRequest(conn net.Conn) {
@@ -44,5 +42,9 @@ func handleRequest(conn net.Conn) {
 		fmt.Printf("%v", resp)
 	}
 
-	conn.Write([]byte("+PONG\r\n"))
+	_, err = conn.Write([]byte("+PONG\r\n"))
+	if err != nil {
+		fmt.Println("Failed to write")
+		os.Exit(1)
+	}
 }
