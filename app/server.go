@@ -34,15 +34,13 @@ func main() {
 
 func handleRequest(conn net.Conn) {
 	reader := bufio.NewReader(conn)
-	l, err := reader.ReadBytes('\n')
-	fmt.Printf("Received %v", l)
-
-	if err != nil {
-		if err != io.EOF {
-			fmt.Println("Error reading:", err.Error())
+	var err error
+	for err != nil {
+		l, err := reader.ReadBytes('\n')
+		if err == io.EOF {
+			conn.Close()
 		}
-		conn.Close()
+		fmt.Printf("Received %v", l)
+		conn.Write([]byte("+PONG\r\n"))
 	}
-	conn.Write([]byte("+PONG\r\n"))
-	conn.Close()
 }
