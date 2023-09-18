@@ -37,10 +37,10 @@ func handleRequest(conn net.Conn) {
 	var parsing bool
 	for !parsing {
 		l, err := reader.ReadBytes('\n')
-		conn.Write([]byte("+PONG\r\n"))
 		if err == io.EOF {
 			break
 		}
+		conn.Write([]byte("+PONG\r\n"))
 		parsing = len(l) == 0
 	}
 	conn.Close()
