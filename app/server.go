@@ -1,9 +1,7 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"io"
 	"net"
 	"os"
 )
@@ -33,18 +31,7 @@ func main() {
 }
 
 func handleRequest(conn net.Conn) {
-	reader := bufio.NewReader(conn)
-	var parsing bool
-	for !parsing {
-		l, err := reader.ReadBytes('\n')
-		if err != nil {
-			if err == io.EOF {
-				break
-			}
-			fmt.Printf("Error received %v", err)
-		}
-		conn.Write([]byte("+PONG\r\n"))
-		parsing = len(l) == 0
-	}
+	// reader := bufio.NewReader(conn)
+	conn.Write([]byte("+PONG\r\n"))
 	conn.Close()
 }
