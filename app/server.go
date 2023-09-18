@@ -22,6 +22,8 @@ func main() {
 
 	for {
 		conn, err := l.Accept()
+		defer conn.Close()
+
 		if err != nil {
 			fmt.Println("Error accepting connection: ", err.Error())
 			os.Exit(1)
@@ -43,5 +45,4 @@ func handleRequest(conn net.Conn) {
 	}
 
 	conn.Write([]byte("+PONG\r\n"))
-	conn.Close()
 }
