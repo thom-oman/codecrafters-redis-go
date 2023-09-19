@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"net"
 	"os"
@@ -19,31 +18,25 @@ func main() {
 		fmt.Println("Failed to bind to port " + CONN_PORT)
 		os.Exit(1)
 	}
+	defer l.Close()
 
 	conn, err := l.Accept()
-	defer conn.Close()
-
 	if err != nil {
 		fmt.Println("Error accepting connection: ", err.Error())
 		os.Exit(1)
 	}
-	reader := bufio.NewReader(conn)
-	for {
-		var resp []byte
-		n, err := reader.Read(resp)
-		if err != nil {
-			fmt.Println("Error reading connection: ", err.Error())
-		}
 
-		if n > 0 {
-			fmt.Printf("%v", resp)
-			_, err = conn.Write([]byte("+PONG\r\n"))
-			if err != nil {
-				fmt.Println("Failed to write")
-				os.Exit(1)
-			}
-		} else {
-			break
+	for {
+		buf := make([]byte, 1024)
+		_, err := conn.Read(buf)
+		if err != nil {
+			fmt.Println("Error parsing incoming message: ", err.Error())
+			os.Exit(1)
+		}
+		_, err = conn.Write([]byte("+PONG\r\n"))
+		if err != nil {
+			fmt.Println("Error sending response: ", err.Error())
+			os.Exit(1)
 		}
 	}
 }
