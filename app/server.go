@@ -8,6 +8,7 @@ import (
 	"net"
 	"os"
 	"strconv"
+	"strings"
 )
 
 const (
@@ -54,10 +55,10 @@ func handleConnection(conn net.Conn) {
 		}
 		// fmt.Println(buf)
 		req, _ := buildRequest(buf)
-		switch req.Command() {
-		case "PING":
+		switch strings.ToLower(req.Command()) {
+		case "ping":
 			writeResponse(conn, []byte("+PONG\r\n"))
-		case "ECHO":
+		case "echo":
 			writeResponse(conn, []byte(req.Args()[0]+"\r\n"))
 		}
 		fmt.Println(req)
@@ -169,7 +170,7 @@ func split(req []byte) [][]byte {
 		if req[i] == 0 {
 			break
 		}
-		fmt.Printf("Appending %v to %v. Complete: %v\n", req[i], cur, cmds)
+		// fmt.Printf("Appending %v to %v. Complete: %v\n", req[i], cur, cmds)
 		cur = append(cur, req[i])
 
 		if len(cur) >= 2 && bytes.Equal(cur[len(cur)-2:], SEPARATOR) {
