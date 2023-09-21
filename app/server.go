@@ -29,13 +29,15 @@ func main() {
 	}
 	defer l.Close()
 
+	// var conns []net.Conn
+
 	for {
 		conn, err := l.Accept()
 		if err != nil {
 			fmt.Println("Error accepting connection: ", err.Error())
 			os.Exit(1)
 		}
-
+		// conns = append(conns, conn)
 		go handleConnection(conn)
 	}
 }
@@ -47,6 +49,7 @@ func handleConnection(conn net.Conn) {
 	for {
 		_, err := conn.Read(buf)
 		if err == io.EOF {
+			fmt.Printf("Reached EOF")
 			break
 		}
 		if err != nil {
@@ -55,6 +58,10 @@ func handleConnection(conn net.Conn) {
 		}
 		// fmt.Println(buf)
 		req, _ := buildRequest(buf)
+		fmt.Println("Command:", string(req.Command()), "Args: ", req.Args())
+		for i := range req.Args() {
+			fmt.Printf("Args (%v):", i, string(req.Args()[i]))
+		}
 		switch strings.ToLower(req.Command()) {
 		case "ping":
 			writeResponse(conn, []byte("+PONG\r\n"))
@@ -85,8 +92,6 @@ func writeResponse(conn net.Conn, resp []byte) {
 type request interface {
 	Command() string
 	Args() []string
-	// Simple() bool
-	// Add([]byte)
 }
 
 type simpleStringsRequest struct {
@@ -100,10 +105,6 @@ func (r simpleStringsRequest) Command() string {
 func (r simpleStringsRequest) Args() []string {
 	return []string{}
 }
-
-// func (r simpleStringsRequest) Simple() bool {
-// 	return true
-// }
 
 type arrayRequest struct {
 	cmd  string
@@ -119,14 +120,8 @@ func (r arrayRequest) Args() []string {
 	return r.args
 }
 
-// func (r arrayRequest) Simple() bool {
-// 	return false
-// }
-
 func buildRequest(req []byte) (request, error) {
-	fmt.Println(req)
 	d := split(req[1:])
-	fmt.Println(d)
 
 	var r request
 
