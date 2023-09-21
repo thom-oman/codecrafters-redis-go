@@ -43,13 +43,13 @@ func main() {
 }
 
 func handleConnection(conn net.Conn) {
-	// defer
+	defer closeConnection(conn)
 	buf := make([]byte, 1024)
 
 	for {
 		_, err := conn.Read(buf)
 		if err == io.EOF {
-			fmt.Printf("Reached EOF")
+			fmt.Println("Reached EOF")
 			break
 		}
 		if err != nil {
@@ -68,12 +68,7 @@ func handleConnection(conn net.Conn) {
 		case "echo":
 			writeResponse(conn, []byte(req.Args()[0]+"\r\n"))
 		}
-		// fmt.Println(req)
-		// for i, _ := range req {
-		// 	fmt.Println(string(req[i]))
-		// }
 	}
-	closeConnection(conn)
 }
 
 func closeConnection(conn net.Conn) {
@@ -122,6 +117,10 @@ func (r arrayRequest) Args() []string {
 
 func buildRequest(req []byte) (request, error) {
 	d := split(req[1:])
+	fmt.Println("Args: ")
+	for i := range d {
+		fmt.Printf("Arg %v: %v \n", i, string(d[i]))
+	}
 
 	var r request
 
