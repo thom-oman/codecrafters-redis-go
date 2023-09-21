@@ -41,7 +41,7 @@ func main() {
 }
 
 func handleConnection(conn net.Conn) {
-	defer conn.Close()
+	defer closeConnection(conn)
 	buf := make([]byte, 1024)
 
 	for {
@@ -61,17 +61,30 @@ func handleConnection(conn net.Conn) {
 		case "echo":
 			writeResponse(conn, []byte(req.Args()[0]+"\r\n"))
 		}
-		fmt.Println(req)
+		// fmt.Println(req)
 		// for i, _ := range req {
 		// 	fmt.Println(string(req[i]))
 		// }
 	}
 }
 
+func closeConnection(conn net.Conn) {
+	fmt.Println("Closing connection")
+	conn.Close()
+}
+
+func writeResponse(conn net.Conn, resp []byte) {
+	_, err := conn.Write(resp)
+	if err != nil {
+		fmt.Println("Error sending response: ", err.Error())
+		os.Exit(1)
+	}
+}
+
 type request interface {
 	Command() string
 	Args() []string
-	Simple() bool
+	// Simple() bool
 	// Add([]byte)
 }
 
@@ -87,9 +100,9 @@ func (r simpleStringsRequest) Args() []string {
 	return []string{}
 }
 
-func (r simpleStringsRequest) Simple() bool {
-	return true
-}
+// func (r simpleStringsRequest) Simple() bool {
+// 	return true
+// }
 
 type arrayRequest struct {
 	cmd  string
@@ -105,17 +118,9 @@ func (r arrayRequest) Args() []string {
 	return r.args
 }
 
-func (r arrayRequest) Simple() bool {
-	return false
-}
-
-func writeResponse(conn net.Conn, resp []byte) {
-	_, err := conn.Write(resp)
-	if err != nil {
-		fmt.Println("Error sending response: ", err.Error())
-		os.Exit(1)
-	}
-}
+// func (r arrayRequest) Simple() bool {
+// 	return false
+// }
 
 func buildRequest(req []byte) (request, error) {
 	fmt.Println(req)
@@ -136,11 +141,13 @@ func buildRequest(req []byte) (request, error) {
 		// Arrays	Aggregate	*
 		l, err := strconv.Atoi(string(d[0]))
 		if err != nil {
+			// TODO return err
 			fmt.Printf("Could not convert %v to int: %v", d[0], err.Error())
 			os.Exit(1)
 		}
 
 		if l != len(d)-1 {
+			// TODO return err
 			fmt.Printf("Expected %v elements but %v provided", l, len(d)-1)
 			os.Exit(1)
 		}
@@ -156,6 +163,7 @@ func buildRequest(req []byte) (request, error) {
 			size: l,
 		}
 	}
+
 	if r == nil {
 		return nil, errors.New(fmt.Sprintf("Invalid first token %v", req[0]))
 	}
