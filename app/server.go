@@ -40,46 +40,45 @@ func main() {
 }
 
 func handleConnection(conn net.Conn) {
-	defer closeConnection(conn)
+	// defer closeConnection(conn)
 
-	for {
-		buf := make([]byte, 1024)
-		_, err := conn.Read(buf)
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			fmt.Println("Error parsing incoming message: ", err.Error())
-			os.Exit(1)
-		}
-		req := parser.NewRequest()
-		req.AddTokens(buf)
-		req.Parse()
-		args := req.Args()
-		cmd, params := args[0], args[1:]
-
-		switch strings.ToLower(cmd) {
-		case "ping":
-			writeResponse(conn, []byte("+PONG\r\n"))
-		case "echo":
-			writeResponse(conn, []byte("+"+params[0]+"\r\n"))
-		case "set":
-			if len(params) != 2 {
-				fmt.Println("Must supply 2 arguments to SET")
-			}
-			key, value := params[0], params[1]
-			fmt.Printf("SET Key: %v, Value: %v", key, value)
-			_ = store.Set(key, value)
-			writeResponse(conn, []byte("+OK\r\n"))
-		case "get":
-			if len(params) != 1 {
-				fmt.Println("Must supply 1 arguments to GET")
-			}
-			key := params[0]
-			value, _ := store.Get(key)
-			writeResponse(conn, []byte("+"+value+"\r\n"))
-		}
+	buf := make([]byte, 1024)
+	_, err := conn.Read(buf)
+	if err == io.EOF {
+		break
 	}
+	if err != nil {
+		fmt.Println("Error parsing incoming message: ", err.Error())
+		os.Exit(1)
+	}
+	req := parser.NewRequest()
+	req.AddTokens(buf)
+	req.Parse()
+	args := req.Args()
+	cmd, params := args[0], args[1:]
+
+	switch strings.ToLower(cmd) {
+	case "ping":
+		writeResponse(conn, []byte("+PONG\r\n"))
+	case "echo":
+		writeResponse(conn, []byte("+"+params[0]+"\r\n"))
+	case "set":
+		if len(params) != 2 {
+			fmt.Println("Must supply 2 arguments to SET")
+		}
+		key, value := params[0], params[1]
+		fmt.Printf("SET Key: %v, Value: %v\n", key, value)
+		_ = store.Set(key, value)
+		writeResponse(conn, []byte("+OK\r\n"))
+	case "get":
+		if len(params) != 1 {
+			fmt.Println("Must supply 1 arguments to GET")
+		}
+		key := params[0]
+		value, _ := store.Get(key)
+		writeResponse(conn, []byte("+"+value+"\r\n"))
+	}
+	closeConnection(conn)
 }
 
 func closeConnection(conn net.Conn) {
