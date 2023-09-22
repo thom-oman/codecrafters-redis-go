@@ -77,7 +77,7 @@ func handleConnection(conn net.Conn) {
 					px, _ = strconv.Atoi(xp[1])
 				}
 			}
-			fmt.Printf("SET Key: %v, Value: %v\n", key, value)
+			fmt.Printf("SET Key: %v, Value: %v, PX: %v/n", key, value, px)
 			_ = store.Set(key, value, px)
 			writeResponse(conn, []byte("+OK\r\n"))
 		case "get":
