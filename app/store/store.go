@@ -6,10 +6,10 @@ import (
 	"time"
 )
 
-var store map[string]value
+var store map[string]*value
 
 func init() {
-	store = make(map[string]value)
+	store = make(map[string]*value)
 }
 
 type value struct {
@@ -22,12 +22,12 @@ func Set(k, v string, px int) error {
 	if px > 0 {
 		val.exp = time.Now().Add(time.Millisecond * time.Duration(px))
 	}
-	store[k] = val
+	store[k] = &val
 	return nil
 }
 
 func Get(k string) (string, error) {
-	val := store[k]
+	val := *store[k]
 	if val.exp.IsZero() {
 		return val.Data, nil
 	}
