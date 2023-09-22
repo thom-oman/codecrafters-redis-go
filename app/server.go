@@ -72,12 +72,12 @@ func handleConnection(conn net.Conn) {
 			key, value, xp := params[0], params[1], params[2:]
 			px := -1
 			if len(xp) != 0 {
-				switch xp[0] {
-				case "PX":
+				switch strings.ToLower(xp[0]) {
+				case "px":
 					px, _ = strconv.Atoi(xp[1])
 				}
 			}
-			fmt.Printf("SET Key: %v, Value: %v, PX: %v/n", key, value, px)
+			fmt.Printf("SET Key: %v, Value: %v, PX: %v\n", key, value, px)
 			_ = store.Set(key, value, px)
 			writeResponse(conn, []byte("+OK\r\n"))
 		case "get":
