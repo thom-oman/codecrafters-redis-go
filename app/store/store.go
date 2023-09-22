@@ -2,6 +2,7 @@ package store
 
 import (
 	"errors"
+	"fmt"
 	"time"
 )
 
@@ -39,5 +40,7 @@ func Get(k string) (string, error) {
 }
 
 func expired(v value) bool {
-	return time.Now().After(v.exp)
+	now := time.Now()
+	fmt.Printf("Checkign if %v is after %v", now, v.exp)
+	return now.After(v.exp)
 }
