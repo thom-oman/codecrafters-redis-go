@@ -89,11 +89,11 @@ func handleConnection(conn net.Conn) {
 			value, _ := store.Get(key)
 			var resp string
 			if len(value) == 0 {
+				resp = fmt.Sprintf("$-1\r\n", len(value))
 				fmt.Println("Sending empty response: ", resp)
-				resp = fmt.Sprintf("$%v\r\n\r\n", len(value))
 			} else {
-				fmt.Println("Sending response: ", resp)
 				resp = fmt.Sprintf("$%v\r\n%v\r\n", len(value), value)
+				fmt.Println("Sending response: ", resp)
 			}
 			writeResponse(conn, []byte(resp))
 		}
