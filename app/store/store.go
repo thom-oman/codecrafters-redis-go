@@ -28,6 +28,7 @@ func Set(k, v string, px int) error {
 
 func Get(k string) (string, error) {
 	val := *store[k]
+	fmt.Println("CHECKING IS ZERO")
 	if val.exp.IsZero() {
 		return val.Data, nil
 	}
