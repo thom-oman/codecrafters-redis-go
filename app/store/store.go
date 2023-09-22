@@ -17,10 +17,14 @@ type value struct {
 	exp  time.Time
 }
 
+func (v *value) SetExpiry(t time.Time) {
+	v.exp = t
+}
+
 func Set(k, v string, px int) error {
 	val := value{Data: v}
 	if px > 0 {
-		val.exp = time.Now().Add(time.Millisecond * time.Duration(px))
+		val.SetExpiry(time.Now().Add(time.Millisecond * time.Duration(px)))
 	}
 	store[k] = &val
 	return nil
