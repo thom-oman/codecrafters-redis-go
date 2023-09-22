@@ -18,7 +18,7 @@ type value struct {
 }
 
 func (v *value) SetExpiry(t time.Time) {
-	v.exp = t
+	v.Exp = t
 }
 
 func Set(k, v string, px int) error {
