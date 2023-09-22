@@ -87,7 +87,12 @@ func handleConnection(conn net.Conn) {
 			key := params[0]
 			// fmt.Printf("GET Key: %v\n", key)
 			value, _ := store.Get(key)
-			resp := fmt.Sprintf("$%v\r\n%v\r\n", len(value), value)
+			var resp string
+			if len(value) == 0 {
+				resp = fmt.Sprintf("$%v\r\n\r\n", len(value))
+			} else {
+				resp = fmt.Sprintf("$%v\r\n%v\r\n", len(value), value)
+			}
 			fmt.Println("Sending response: ", resp)
 			writeResponse(conn, []byte(resp))
 		}
