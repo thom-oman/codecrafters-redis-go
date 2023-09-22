@@ -24,7 +24,9 @@ func (v *value) SetExpiry(t time.Time) {
 func Set(k, v string, px int) error {
 	val := &value{Data: v}
 	if px > 0 {
-		val.SetExpiry(time.Now().Add(time.Millisecond * time.Duration(px)))
+		exp := time.Now().Add(time.Millisecond * time.Duration(px))
+		fmt.Printf("Setting exp: %v\n", exp)
+		val.SetExpiry(exp)
 	}
 	fmt.Printf("Val = %v\n", val)
 	fmt.Printf("&Val = %v\n", &val)
