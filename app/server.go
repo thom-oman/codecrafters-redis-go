@@ -40,7 +40,7 @@ func main() {
 }
 
 func handleConnection(conn net.Conn) {
-	defer closeConnection(conn)
+	// defer closeConnection(conn)
 
 	for {
 		buf := make([]byte, 1024)
