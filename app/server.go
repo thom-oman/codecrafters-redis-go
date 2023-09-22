@@ -68,6 +68,7 @@ func handleConnection(conn net.Conn) {
 				fmt.Println("Must supply 2 arguments to SET")
 			}
 			key, value := params[0], params[1]
+			fmt.Printf("SET Key: %v, Value: %v", key, value)
 			_ = store.Set(key, value)
 			writeResponse(conn, []byte("+OK\r\n"))
 		case "get":
