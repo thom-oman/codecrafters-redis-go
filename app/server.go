@@ -77,7 +77,7 @@ func handleConnection(conn net.Conn) {
 					px, _ = strconv.Atoi(xp[1])
 				}
 			}
-			fmt.Printf("SET Key: %v, Value: %v, PX: %v\n", key, value, px)
+			// fmt.Printf("SET Key: %v, Value: %v, PX: %v\n", key, value, px)
 			_ = store.Set(key, value, px)
 			writeResponse(conn, []byte("+OK\r\n"))
 		case "get":
@@ -85,7 +85,7 @@ func handleConnection(conn net.Conn) {
 				fmt.Println("Must supply 1 arguments to GET")
 			}
 			key := params[0]
-			fmt.Printf("GET Key: %v\n", key)
+			// fmt.Printf("GET Key: %v\n", key)
 			value, _ := store.Get(key)
 			resp := fmt.Sprintf("$%v\r\n%v\r\n", len(value), value)
 			writeResponse(conn, []byte(resp))

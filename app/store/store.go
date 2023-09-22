@@ -2,7 +2,6 @@ package store
 
 import (
 	"errors"
-	"fmt"
 	"time"
 )
 
@@ -24,37 +23,28 @@ func (v *value) SetExpiry(t time.Time) {
 func Set(k, v string, px int) error {
 	val := &value{Data: v}
 	if px > 0 {
-		exp := time.Now().Add(time.Millisecond * time.Duration(px))
-		fmt.Printf("Setting exp: %v\n", exp)
-		val.SetExpiry(exp)
+		val.SetExpiry(time.Now().Add(time.Millisecond * time.Duration(px)))
 	}
-	fmt.Printf("Val = %v\n", val)
-	fmt.Printf("&Val = %v\n", &val)
-	fmt.Printf("*Val = %v\n", *val)
 	store[k] = val
 	return nil
 }
 
-func Get(k string) (string, error) {
+func Get(k string) (value string, err error) {
 	val := *store[k]
-	fmt.Printf("Val = %v\n", val)
-	fmt.Printf("&Val = %v\n", &val)
-	fmt.Println("CHECKING IS ZERO")
 	if val.Exp.IsZero() {
-		return val.Data, nil
+		value = val.Data
+		return
 	}
 
-	fmt.Println("CHECKING EXPIRY")
 	if expired(val) {
-		return "", errors.New("Key has expired")
+		err = errors.New("Key has expired")
+		return
 	}
-	fmt.Println("CHECKED EXPIRY")
 
 	return val.Data, nil
 }
 
 func expired(v value) bool {
 	now := time.Now()
-	fmt.Printf("Checkign if %v is after %v", now, v.Exp)
 	return now.After(v.Exp)
 }
