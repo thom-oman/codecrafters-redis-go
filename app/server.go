@@ -5,8 +5,9 @@ import (
 	"io"
 	"net"
 	"os"
+	"strings"
 
-	"github.com/thom-oman/codecrafters-redis-go/parser"
+	"github.com/thom-oman/codecrafters-redis-go/app/parser"
 )
 
 const (
@@ -14,9 +15,9 @@ const (
 	CONN_TYPE = "tcp"
 )
 
-var (
-	SEPARATOR = []byte{13, 10}
-)
+// var (
+// 	SEPARATOR = []byte{13, 10}
+// )
 
 func main() {
 	fmt.Printf("Listening on port %v\n", CONN_PORT)
@@ -27,15 +28,12 @@ func main() {
 	}
 	defer l.Close()
 
-	// var conns []net.Conn
-
 	for {
 		conn, err := l.Accept()
 		if err != nil {
 			fmt.Println("Error accepting connection: ", err.Error())
 			os.Exit(1)
 		}
-		// conns = append(conns, conn)
 		go handleConnection(conn)
 	}
 }
@@ -55,23 +53,17 @@ func handleConnection(conn net.Conn) {
 			os.Exit(1)
 		}
 		req := parser.NewRequest()
-
-		for i := range buf {
-			b := buf[i]
-			if b == 0 {
-				break
-			}
-			req.AddToken(b)
-		}
-
+		req.AddTokens(buf)
 		req.Parse()
+		args := req.Args()
+		cmd, params := args[0], args[1:]
 
-		// switch strings.ToLower(req.Command()) {
-		// case "ping":
-		// 	writeResponse(conn, []byte("+PONG\r\n"))
-		// case "echo":
-		// 	writeResponse(conn, []byte(req.Args()[0]+"\r\n"))
-		// }
+		switch strings.ToLower(cmd) {
+		case "ping":
+			writeResponse(conn, []byte("+PONG\r\n"))
+		case "echo":
+			writeResponse(conn, []byte(params[0]+"\r\n"))
+		}
 	}
 }
 
