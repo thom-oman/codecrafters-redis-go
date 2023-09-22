@@ -62,7 +62,7 @@ func handleConnection(conn net.Conn) {
 		case "ping":
 			writeResponse(conn, []byte("+PONG\r\n"))
 		case "echo":
-			writeResponse(conn, []byte(params[0]+"\r\n"))
+			writeResponse(conn, []byte("+"+params[0]+"\r\n"))
 		}
 	}
 }
