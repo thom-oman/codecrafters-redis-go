@@ -32,9 +32,11 @@ func Get(k string) (string, error) {
 		return val.Data, nil
 	}
 
+	fmt.Println("CHECKING EXPIRY")
 	if expired(val) {
 		return "", errors.New("Key has expired")
 	}
+	fmt.Println("CHECKED EXPIRY")
 
 	return val.Data, nil
 }

@@ -81,6 +81,7 @@ func handleConnection(conn net.Conn) {
 				fmt.Println("Must supply 1 arguments to GET")
 			}
 			key := params[0]
+			fmt.Printf("GET Key: %v\n", key)
 			value, _ := store.Get(key)
 			resp := fmt.Sprintf("$%v\r\n%v\r\n", len(value), value)
 			writeResponse(conn, []byte(resp))
