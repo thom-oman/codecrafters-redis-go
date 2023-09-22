@@ -37,7 +37,6 @@ func Get(k string) (string, error) {
 	val := *store[k]
 	fmt.Printf("Val = %v", val)
 	fmt.Printf("&Val = %v", &val)
-	fmt.Printf("*Val = %v", *val)
 	fmt.Println("CHECKING IS ZERO")
 	if val.exp.IsZero() {
 		return val.Data, nil
