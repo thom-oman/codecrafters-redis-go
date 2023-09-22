@@ -64,12 +64,16 @@ func handleConnection(conn net.Conn) {
 		case "echo":
 			writeResponse(conn, []byte("+"+params[0]+"\r\n"))
 		case "set":
-			if len(params) != 2 {
+			if len(params) <= 2 {
 				fmt.Println("Must supply 2 arguments to SET")
 			}
-			key, value := params[0], params[1]
+			key, value, xp := params[0], params[1], params[2:]
+			px := -1
+			if len(xp) != 0 {
+
+			}
 			fmt.Printf("SET Key: %v, Value: %v\n", key, value)
-			_ = store.Set(key, value)
+			_ = store.Set(key, value, px)
 			writeResponse(conn, []byte("+OK\r\n"))
 		case "get":
 			if len(params) != 1 {
