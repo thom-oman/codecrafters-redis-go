@@ -14,7 +14,7 @@ func init() {
 
 type value struct {
 	Data string
-	exp  time.Time
+	Exp  time.Time
 }
 
 func (v *value) SetExpiry(t time.Time) {
@@ -38,7 +38,7 @@ func Get(k string) (string, error) {
 	fmt.Printf("Val = %v\n", val)
 	fmt.Printf("&Val = %v\n", &val)
 	fmt.Println("CHECKING IS ZERO")
-	if val.exp.IsZero() {
+	if val.Exp.IsZero() {
 		return val.Data, nil
 	}
 
@@ -54,5 +54,5 @@ func Get(k string) (string, error) {
 func expired(v value) bool {
 	now := time.Now()
 	fmt.Printf("Checkign if %v is after %v", now, v.exp)
-	return now.After(v.exp)
+	return now.After(v.Exp)
 }
