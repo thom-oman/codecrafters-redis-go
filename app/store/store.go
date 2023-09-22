@@ -22,11 +22,11 @@ func (v *value) SetExpiry(t time.Time) {
 }
 
 func Set(k, v string, px int) error {
-	val := value{Data: v}
+	val := &value{Data: v}
 	if px > 0 {
 		val.SetExpiry(time.Now().Add(time.Millisecond * time.Duration(px)))
 	}
-	store[k] = &val
+	store[k] = val
 	return nil
 }
 
