@@ -53,6 +53,6 @@ func Get(k string) (string, error) {
 
 func expired(v value) bool {
 	now := time.Now()
-	fmt.Printf("Checkign if %v is after %v", now, v.exp)
+	fmt.Printf("Checkign if %v is after %v", now, v.Exp)
 	return now.After(v.Exp)
 }
