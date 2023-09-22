@@ -5,6 +5,7 @@ import (
 	"io"
 	"net"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/thom-oman/codecrafters-redis-go/app/parser"
@@ -71,7 +72,10 @@ func handleConnection(conn net.Conn) {
 			key, value, xp := params[0], params[1], params[2:]
 			px := -1
 			if len(xp) != 0 {
-
+				switch xp[0] {
+				case "PX":
+					px, _ = strconv.Atoi(xp[1])
+				}
 			}
 			fmt.Printf("SET Key: %v, Value: %v\n", key, value)
 			_ = store.Set(key, value, px)
