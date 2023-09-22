@@ -53,6 +53,7 @@ func handleConnection(conn net.Conn) {
 			os.Exit(1)
 		}
 		req := parser.NewRequest()
+		fmt.Printf("Parsing %v\n", string(buf))
 		req.AddTokens(buf)
 		req.Parse()
 		args := req.Args()
