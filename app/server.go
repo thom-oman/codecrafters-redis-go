@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/thom-oman/codecrafters-redis-go/app/parser"
+	"github.com/thom-oman/codecrafters-redis-go/app/store"
 )
 
 const (
@@ -45,7 +46,6 @@ func handleConnection(conn net.Conn) {
 		buf := make([]byte, 1024)
 		_, err := conn.Read(buf)
 		if err == io.EOF {
-			fmt.Println("Reached EOF")
 			break
 		}
 		if err != nil {
@@ -63,6 +63,20 @@ func handleConnection(conn net.Conn) {
 			writeResponse(conn, []byte("+PONG\r\n"))
 		case "echo":
 			writeResponse(conn, []byte("+"+params[0]+"\r\n"))
+		case "set":
+			if len(params) != 2 {
+				fmt.Println("Must supply 2 arguments to SET")
+			}
+			key, value := params[0], params[1]
+			_ = store.Set(key, value)
+			writeResponse(conn, []byte("+OK\r\n"))
+		case "get":
+			if len(params) != 1 {
+				fmt.Println("Must supply 1 arguments to GET")
+			}
+			key := params[0]
+			value, _ := store.Get(key)
+			writeResponse(conn, []byte("+"+value+"\r\n"))
 		}
 	}
 }
