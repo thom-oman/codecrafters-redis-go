@@ -13,7 +13,6 @@ type request struct {
 	parsed bool
 	cur    int
 	simple bool
-	// root
 	args []string
 }
 
@@ -68,25 +67,19 @@ func (r *request) Parse() error {
 		switch r.tokens[i] {
 		case 36: // $ (Bulk strings)
 			if parsedHeader {
-				for isNumber(r.tokens[i+1]) { // skip length for now
-					// bs = append(bs, r.tokens[i+1])
+				for isNumber(r.tokens[i+1]) {
 					i++
 				}
-			} else {
-
 			}
 		case 42: // * (Arrays)
 			if !parsedHeader {
-				// var l int
 				var bs []byte
-				// Keep checking next token until it isn't a number
 				for isNumber(r.tokens[i+1]) {
 					bs = append(bs, r.tokens[i+1])
 					i++
 				}
 				l, err := strconv.Atoi(string(bs))
 				if err != nil {
-					// log.Fatal(err.Error())
 					return err
 				}
 				argLength = l

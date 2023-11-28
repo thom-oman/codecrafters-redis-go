@@ -17,44 +17,49 @@ const (
 	CONN_TYPE = "tcp"
 )
 
-// var (
-// 	SEPARATOR = []byte{13, 10}
-// )
-
 func main() {
 	fmt.Printf("Listening on port %v\n", CONN_PORT)
+	l := startListen()
+	defer l.Close()
+
+	for {
+		acceptConnection(l)
+	}
+}
+
+func startListen() net.Listener {
 	l, err := net.Listen(CONN_TYPE, "0.0.0.0:"+CONN_PORT)
 	if err != nil {
 		fmt.Println("Failed to bind to port " + CONN_PORT)
 		os.Exit(1)
 	}
-	defer l.Close()
+	return l
+}
 
-	for {
-		conn, err := l.Accept()
-		if err != nil {
-			fmt.Println("Error accepting connection: ", err.Error())
-			os.Exit(1)
-		}
-		go handleConnection(conn)
+func acceptConnection(l net.Listener) {
+	conn, err := l.Accept()
+	if err != nil {
+		fmt.Println("Error accepting connection: ", err.Error())
+		os.Exit(1)
 	}
+	go handleConnection(conn)
 }
 
 func handleConnection(conn net.Conn) {
-	// defer closeConnection(conn)
+	defer closeConnection(conn)
 
-	for {
+	// for {
 		buf := make([]byte, 1024)
 		_, err := conn.Read(buf)
 		if err == io.EOF {
-			break
+			// break
+			return
 		}
 		if err != nil {
 			fmt.Println("Error parsing incoming message: ", err.Error())
 			os.Exit(1)
 		}
 		req := parser.NewRequest()
-		fmt.Printf("Parsing %v\n", string(buf))
 		req.AddTokens(buf)
 		req.Parse()
 		args := req.Args()
@@ -77,7 +82,6 @@ func handleConnection(conn net.Conn) {
 					px, _ = strconv.Atoi(xp[1])
 				}
 			}
-			// fmt.Printf("SET Key: %v, Value: %v, PX: %v\n", key, value, px)
 			_ = store.Set(key, value, px)
 			writeResponse(conn, []byte("+OK\r\n"))
 		case "get":
@@ -85,19 +89,14 @@ func handleConnection(conn net.Conn) {
 				fmt.Println("Must supply 1 arguments to GET")
 			}
 			key := params[0]
-			// fmt.Printf("GET Key: %v\n", key)
 			value, _ := store.Get(key)
-			var resp string
+			resp := fmt.Sprintf("$%v\r\n%v\r\n", len(value), value)
 			if len(value) == 0 {
-				resp = fmt.Sprintf("$-1\r\n", len(value))
-				fmt.Println("Sending empty response: ", resp)
-			} else {
-				resp = fmt.Sprintf("$%v\r\n%v\r\n", len(value), value)
-				fmt.Println("Sending response: ", resp)
+				resp = fmt.Sprintf("$-1\r\n")
 			}
 			writeResponse(conn, []byte(resp))
 		}
-	}
+	// }
 }
 
 func closeConnection(conn net.Conn) {

@@ -10,16 +10,8 @@ func TestAddToken(t *testing.T) {
 		tokens       []byte
 		expectedSize int
 	}{
-		{
-			"normal",
-			[]byte("abc"),
-			3,
-		},
-		{
-			"ignores 0 bytes",
-			append([]byte("abc"), 0),
-			3,
-		},
+		{ "normal", []byte("abc"), 3, },
+		{ "ignores 0 bytes", append([]byte("abc"), 0), 3, },
 	}
 
 	for _, tt := range tests {
@@ -48,27 +40,14 @@ func TestParse(t *testing.T) {
 		simple bool
 		err    error
 	}{
-		{
-			"valid ping command",
-			[]byte("*1\r\n$4\r\nping\r\n"),
-			[]string{"ping"},
-			false,
-			nil,
-		},
-		{
-			"valid echo command",
-			[]byte("*2\r\n$4\r\nECHO\r\n$3\r\nhey\r\n"),
-			[]string{"ECHO", "hey"},
-			false,
-			nil,
-		},
+		{ "valid ping command", []byte("*1\r\n$4\r\nping\r\n"), []string{"ping"}, false, nil, },
+		{ "valid echo command", []byte("*2\r\n$4\r\nECHO\r\n$3\r\nhey\r\n"), []string{"ECHO", "hey"}, false, nil, },
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			req := NewRequest()
 			req.AddTokens(tt.tokens)
 			err := req.Parse()
-			// fmt.Printf("Parsed args: %v", req.Args())
 
 			if err != tt.err {
 				if tt.err != nil {
